@@ -8,7 +8,7 @@ import { fetchNoteById } from "@/lib/api";
 import Loading from "@/app/loading";
 
 export default function NotePreview() {
-  //  Отримуємо id нотатки з маршруту
+  //  Отримуємо id нотатки з маршрут
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
@@ -19,8 +19,8 @@ export default function NotePreview() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
-    enabled: !!id, 
-    refetchOnMount: false
+    enabled: !!id,
+    refetchOnMount: false,
   });
 
   return (
