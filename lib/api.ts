@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Note, NewNote, CategoryType } from "@/types/note";
+import type { Note, NewNote } from "@/types/note";
 
 const BASE_URL = "https://notehub-public.goit.study/api";
 
@@ -10,7 +10,6 @@ export interface NotesHttpResponse {
 
 interface FetchNotesParams {
   page: number;
-  perPage: number;
   search?: string;
   tag?: string;
 }
@@ -33,13 +32,11 @@ export const fetchNotes = async (
 ): Promise<NotesHttpResponse> => {
   const api = getApiInstance();
 
-  const queryParams: Record<string, string | number> = {
+  const queryParams: Record<string, string | number | undefined> = {
     page: params.page,
-    perPage: params.perPage,
+    search: params.search,
+    tag: params.tag && params.tag !== "all" ? params.tag : undefined,
   };
-
-  if (params.search) queryParams.search = params.search;
-  if (params.tag && params.tag !== "all") queryParams.tag = params.tag;
 
   const res = await api.get<NotesHttpResponse>("/notes", {
     params: queryParams,
@@ -62,25 +59,5 @@ export const createNote = async (newNote: NewNote): Promise<Note> => {
 export const deleteNote = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.delete<Note>(`/notes/${id}`);
-  return res.data;
-};
-
-export const getCategories = async (): Promise<CategoryType[]> => {
-  const api = getApiInstance();
-  const res = await api.get<CategoryType[]>("/categories");
-  return res.data;
-};
-
-export interface NewNoteData {
-  title: string;
-  content: string;
-}
-
-export const editNote = async (
-  id: string,
-  newNotedata: NewNoteData
-): Promise<Note> => {
-  const api = getApiInstance();
-  const res = await api.patch<Note>(`/notes/${id}`, newNotedata);
   return res.data;
 };
