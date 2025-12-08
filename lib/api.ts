@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Note, NewNote, CategoryType } from "@/types/note";
+import type { Note, NewNote } from "@/types/note";
 
 const BASE_URL = "https://notehub-public.goit.study/api";
 
@@ -8,13 +8,15 @@ export interface NotesHttpResponse {
   totalPages: number;
 }
 
+// Интерфейс параметров запроса нотаток:
+// perPage удалён (не обязателен по требованиям)
 interface FetchNotesParams {
   page: number;
-  perPage: number;
   search?: string;
   tag?: string;
 }
 
+// Хелпер для создания axios-инстанса с токеном
 const getApiInstance = () => {
   const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
   if (!token) throw new Error("NEXT_PUBLIC_NOTEHUB_TOKEN is missing!");
@@ -28,6 +30,7 @@ const getApiInstance = () => {
   });
 };
 
+// Получить все заметки (поддержка поиска и фильтрации по tag)
 export const fetchNotes = async (
   params: FetchNotesParams
 ): Promise<NotesHttpResponse> => {
@@ -35,7 +38,6 @@ export const fetchNotes = async (
 
   const queryParams: Record<string, string | number> = {
     page: params.page,
-    perPage: params.perPage,
   };
 
   if (params.search) queryParams.search = params.search;
@@ -47,40 +49,23 @@ export const fetchNotes = async (
   return res.data;
 };
 
+// Получить заметку по ID
 export const fetchNoteById = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.get<Note>(`/notes/${id}`);
   return res.data;
 };
 
+// Создать новую заметку
 export const createNote = async (newNote: NewNote): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.post<Note>("/notes", newNote);
   return res.data;
 };
 
+// Удалить заметку по ID
 export const deleteNote = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.delete<Note>(`/notes/${id}`);
-  return res.data;
-};
-
-export const getCategories = async (): Promise<CategoryType[]> => {
-  const api = getApiInstance();
-  const res = await api.get<CategoryType[]>("/categories");
-  return res.data;
-};
-
-export interface NewNoteData {
-  title: string;
-  content: string;
-}
-
-export const editNote = async (
-  id: string,
-  newNotedata: Partial<NewNoteData>
-): Promise<Note> => {
-  const api = getApiInstance();
-  const res = await api.patch<Note>(`/notes/${id}`, newNotedata);
   return res.data;
 };
