@@ -8,7 +8,6 @@ export interface NotesHttpResponse {
   totalPages: number;
 }
 
-// Інтерфейс для параметрів запиту нотаток
 interface FetchNotesParams {
   page: number;
   perPage: number;
@@ -16,7 +15,6 @@ interface FetchNotesParams {
   tag?: string;
 }
 
-// Допоміжна функція для створення axios-інстансу з токеном
 const getApiInstance = () => {
   const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
   if (!token) throw new Error("NEXT_PUBLIC_NOTEHUB_TOKEN is missing!");
@@ -30,11 +28,11 @@ const getApiInstance = () => {
   });
 };
 
-//  Отримати всі нотатки
-export const fetchNotes = async (params: FetchNotesParams): Promise<NotesHttpResponse> => {
+export const fetchNotes = async (
+  params: FetchNotesParams
+): Promise<NotesHttpResponse> => {
   const api = getApiInstance();
 
-  // Створюємо об’єкт параметрів із чіткими типами
   const queryParams: Record<string, string | number> = {
     page: params.page,
     perPage: params.perPage,
@@ -43,32 +41,30 @@ export const fetchNotes = async (params: FetchNotesParams): Promise<NotesHttpRes
   if (params.search) queryParams.search = params.search;
   if (params.tag && params.tag !== "all") queryParams.tag = params.tag;
 
-  const res = await api.get<NotesHttpResponse>("/notes", { params: queryParams });
+  const res = await api.get<NotesHttpResponse>("/notes", {
+    params: queryParams,
+  });
   return res.data;
 };
 
-//  Отримати нотатку за ID
 export const fetchNoteById = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.get<Note>(`/notes/${id}`);
   return res.data;
 };
 
-//  Створити нову нотатку
 export const createNote = async (newNote: NewNote): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.post<Note>("/notes", newNote);
   return res.data;
 };
 
-//  Видалити нотатку за ID
 export const deleteNote = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.delete<Note>(`/notes/${id}`);
   return res.data;
 };
 
-//  Отримати категорії
 export const getCategories = async (): Promise<CategoryType[]> => {
   const api = getApiInstance();
   const res = await api.get<CategoryType[]>("/categories");
@@ -82,8 +78,9 @@ export interface NewNoteData {
 
 export const editNote = async (
   id: string,
-  newNotedata: NewNoteData
+  newNotedata: Partial<NewNoteData>
 ): Promise<Note> => {
-  const { data } = await axios.patch<Note>(`/notes/${id}`, newNotedata);
-  return data;
+  const api = getApiInstance();
+  const res = await api.patch<Note>(`/notes/${id}`, newNotedata);
+  return res.data;
 };
