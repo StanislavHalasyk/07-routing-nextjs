@@ -8,15 +8,12 @@ export interface NotesHttpResponse {
   totalPages: number;
 }
 
-// Интерфейс параметров запроса нотаток:
-// perPage удалён (не обязателен по требованиям)
 interface FetchNotesParams {
   page: number;
   search?: string;
   tag?: string;
 }
 
-// Хелпер для создания axios-инстанса с токеном
 const getApiInstance = () => {
   const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
   if (!token) throw new Error("NEXT_PUBLIC_NOTEHUB_TOKEN is missing!");
@@ -30,7 +27,6 @@ const getApiInstance = () => {
   });
 };
 
-// Получить все заметки (поддержка поиска и фильтрации по tag)
 export const fetchNotes = async (
   params: FetchNotesParams
 ): Promise<NotesHttpResponse> => {
@@ -49,21 +45,18 @@ export const fetchNotes = async (
   return res.data;
 };
 
-// Получить заметку по ID
 export const fetchNoteById = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.get<Note>(`/notes/${id}`);
   return res.data;
 };
 
-// Создать новую заметку
 export const createNote = async (newNote: NewNote): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.post<Note>("/notes", newNote);
   return res.data;
 };
 
-// Удалить заметку по ID
 export const deleteNote = async (id: string): Promise<Note> => {
   const api = getApiInstance();
   const res = await api.delete<Note>(`/notes/${id}`);
