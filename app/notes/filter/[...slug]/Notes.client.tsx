@@ -22,7 +22,6 @@ export default function NotesClient({ category }: NotesClientProps) {
   const [topic, setTopic] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  
   const debouncedSearch = useDebounce(topic, 500);
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function NotesClient({ category }: NotesClientProps) {
     queryFn: () =>
       fetchNotes({
         page,
-        perPage: 12,
+
         tag: category,
         search: debouncedSearch,
       }),
@@ -47,37 +46,30 @@ export default function NotesClient({ category }: NotesClientProps) {
 
   return (
     <div className={css.app}>
+      <SearchBox onSearch={setTopic} searchQuery={topic} />
 
-        
-        <SearchBox onSearch={setTopic} searchQuery={topic} />
+      {isSuccess && data?.totalPages > 1 && (
+        <Pagination
+          totalPages={data.totalPages}
+          currentPage={page}
+          onPageChange={(selectedPage) => setPage(selectedPage)}
+        />
+      )}
 
-      
-        {isSuccess && data?.totalPages > 1 && (
-  <Pagination
-    totalPages={data.totalPages}
-    currentPage={page}
-    onPageChange={(selectedPage) => setPage(selectedPage)} 
-  />
-)}
+      <button className={css.button} onClick={openModal}>
+        Create note +
+      </button>
 
-        
-        <button className={css.button} onClick={openModal}>
-          Create note +
-        </button>
-
-      
       {isLoading && <Loading />}
       {isError && <Error error={error} />}
 
-     
       {data && <NoteList notes={data.notes} />}
 
-      
       {isModalOpen && (
-  <Modal onClose={closeModal}>
-    <NoteForm onCancel={closeModal} onCreated={closeModal} />
-  </Modal>
-)}
+        <Modal onClose={closeModal}>
+          <NoteForm onCancel={closeModal} onCreated={closeModal} />
+        </Modal>
+      )}
     </div>
   );
 }
