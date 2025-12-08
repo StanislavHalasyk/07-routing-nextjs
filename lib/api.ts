@@ -31,9 +31,7 @@ const getApiInstance = () => {
 };
 
 //  Отримати всі нотатки
-export const fetchNotes = async (
-  params: FetchNotesParams
-): Promise<NotesHttpResponse> => {
+export const fetchNotes = async (params: FetchNotesParams): Promise<NotesHttpResponse> => {
   const api = getApiInstance();
 
   // Створюємо об’єкт параметрів із чіткими типами
@@ -45,9 +43,7 @@ export const fetchNotes = async (
   if (params.search) queryParams.search = params.search;
   if (params.tag && params.tag !== "all") queryParams.tag = params.tag;
 
-  const res = await api.get<NotesHttpResponse>("/notes", {
-    params: queryParams,
-  });
+  const res = await api.get<NotesHttpResponse>("/notes", { params: queryParams });
   return res.data;
 };
 
@@ -88,7 +84,6 @@ export const editNote = async (
   id: string,
   newNotedata: NewNoteData
 ): Promise<Note> => {
-  const api = getApiInstance(); // використання єдиного інстансу з токеном
-  const res = await api.patch<Note>(`/notes/${id}`, newNotedata);
-  return res.data;
+  const { data } = await axios.patch<Note>(`/notes/${id}`, newNotedata);
+  return data;
 };
